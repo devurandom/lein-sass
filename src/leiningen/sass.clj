@@ -219,6 +219,10 @@
   (importer-callback files))
 
 (defn sass [{{:keys [source target]} :sass} & opts]
+  (when-not (string? source)
+    (throw (Exception. (str "-> :sass :source not a string: " source))))
+  (when-not (string? target)
+    (throw (Exception. (str "-> :sass :target not a string: " target))))
   (let [source-directory (io/file source)
         find-files #(concat (find-assets source-directory ".sass")
                             (find-assets source-directory ".scss"))
