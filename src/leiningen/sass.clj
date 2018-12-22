@@ -5,8 +5,10 @@
     [clojure.set :refer [rename-keys]]
     [clojure.string :as s])
   (:import
-    (java.nio.file FileSystems Paths StandardWatchEventKinds)
-    (javax.script Invocable ScriptEngineManager)))
+    (com.sun.nio.file SensitivityWatchEventModifier)
+    (java.io File FileNotFoundException Reader)
+    (java.nio.file FileSystems Path Paths StandardWatchEventKinds WatchService)
+    (javax.script Invocable ScriptEngine ScriptEngineManager)))
 
 (def compiled? (atom false))
 (defonce engine (let [e (.getEngineByName (ScriptEngineManager.) "nashorn")]
@@ -62,7 +64,7 @@
                 StandardWatchEventKinds/ENTRY_MODIFY
                 StandardWatchEventKinds/ENTRY_DELETE
                 StandardWatchEventKinds/OVERFLOW])
-             (into-array [(com.sun.nio.file.SensitivityWatchEventModifier/HIGH)])))
+             (into-array [(SensitivityWatchEventModifier/HIGH)])))
 
 (defn watch-loop [watch-service handler]
   (while true
@@ -244,7 +246,7 @@
                                    (register-files-for-import files)
                                    (compile-assets files-without-partials target source))
                                  ;; If user changes a file's name, this exception is thrown
-                                 (catch java.io.FileNotFoundException ex
+                                 (catch FileNotFoundException ex
                                    (println (.getMessage ex))
                                    (let [files (find-files)
                                          files-without-partials (find-files-without-partials files)]
