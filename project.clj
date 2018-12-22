@@ -7,4 +7,5 @@
   :profiles {:kaocha {:dependencies [[lambdaisland/kaocha "0.0-319"]
                                      [lambdaisland/kaocha-cloverage "0.0-22"]
                                      [lambdaisland/kaocha-junit-xml "0.0-47"]]}}
-  :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner"]})
+  :aliases {"kaocha" ["with-profile" "+kaocha" "run" "-m" "kaocha.runner"]}
+  :test-paths ["test/unit" "test/integration"])
