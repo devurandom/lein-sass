@@ -1,0 +1,1 @@
+function setTimeout(f) {f();}

@@ -11,50 +11,10 @@
     (javax.script Invocable ScriptEngine ScriptEngineManager)))
 
 (def compiled? (atom false))
-(defonce engine (let [e (.getEngineByName (ScriptEngineManager.) "nashorn")]
-                  (.eval e "function setTimeout(f) {f();};")
-                  (.eval e (io/reader (io/resource "sass.sync.js")))
-                  (.eval e "var source = '';")
-                  (.eval e "var options = '';")
-                  (.eval e "var output = '';")
-                  (.eval e "var output_formatted = '';")
-                  (.eval e "var output_map = '';")
-                  (.eval e "var output_text = '';")
-                  (.eval e "var output_column = '';")
-                  (.eval e "var output_line = '';")
-                  (.eval e "var output_status = '';")
-                  (.eval e "var output_file = '';")
-                  (.eval e "var input_relative_path = '';")
-                  (.eval e (str "function setSourceAndOptions(input, input_path, output_name) {"
-                                "source = input;"
-                                "input_relative_path = input_path;"
-                                "options = {inputPath: input_path, outputPath: output_name};"
-                                "};"))
-                  (.eval e (str "function setOutput(result) {"
-                                "output = result;"
-                                "output_formatted = result.formatted;"
-                                "output_map = result.map;"
-                                "if (output_map != undefined) {"
-                                "  if ('sourcesContent' in output_map) { delete output_map.sourcesContent; }"
-                                "  if ('sourceRoot' in output_map) { delete output_map.sourceRoot; }"
-                                "  output_map.sources = [input_relative_path];"
-                                "}"
-                                "output_text = result.text;"
-                                "output_column = result.column;"
-                                "output_line = result.line;"
-                                "output_status = result.status;"
-                                "output_file = result.file;"
-                                "};"))
-                  (.eval e (str "function simpleIncludes(arr, value) {"
-                                "output = false;"
-                                "arr.forEach(function(a, b, c) {"
-                                "  if (a === value) {"
-                                "    output = true;"
-                                "  }"
-                                "});"
-                                "return output;"
-                                "};"))
-                  e))
+(defonce engine (doto (.getEngineByName (ScriptEngineManager.) "nashorn")
+                  (.eval (io/reader (io/resource "stubs.js")))
+                  (.eval (io/reader (io/resource "sass.sync.js")))
+                  (.eval (io/reader (io/resource "init.js")))))
 
 (defn register-events! [dir watch-service]
   (.register dir
