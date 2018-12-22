@@ -1,0 +1,55 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.1
+
+executors:
+  openjdk-11-lein-2_8_3:
+    docker:
+      - image: "circleci/clojure:openjdk-11-lein-2.8.3@sha256:566c3e87c0597f50b4b6ca6c15c7b0e4803d0406002077db4a1fb5d74828c04e"
+  openjdk-8-lein-2_8_3:
+    docker:
+      - image: "circleci/clojure:openjdk-8-lein-2.8.3@sha256:d081e4d0ce8207bce568298cc50f83997f425ae6c4aad6f1068ed0e2e0ca2289"
+
+commands:
+  checkout_and_run:
+    parameters:
+      job_name:
+        type: string
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - <<parameters.job_name>>-{{ checksum "project.clj" }}
+            # fallback to using the latest cache if no exact match is found
+            - <<parameters.job_name>>-
+      - run:
+          name: "Run tests"
+          command: lein kaocha --reporter documentation --plugin profiling --plugin junit-xml --junit-xml-file test-results/<<parameters.job_name>>/results.xml --plugin cloverage --codecov
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: <<parameters.job_name>>-{{ checksum "project.clj" }}
+      - codecov/upload:
+          file: "target/coverage/*.json"
+          flags: default
+          upload_name: <<parameters.job_name>>
+      - store_test_results:
+          path: test-results/
+jobs:
+  java-11:
+    executor: openjdk-11-lein-2_8_3
+    steps:
+      - checkout_and_run:
+          job_name: "java-11"
+  java-8:
+    executor: openjdk-8-lein-2_8_3
+    steps:
+      - checkout_and_run:
+          job_name: "java-8"
+workflows:
+  lein_sass_test:
+    jobs:
+      - java-11
+      - java-8

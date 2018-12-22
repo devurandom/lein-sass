@@ -10,6 +10,7 @@ pom.xml.asc
 /lib/
 /classes/
 /target/
+/test-results/
 /checkouts/
 .lein-deps-sum
 .lein-repl-history
