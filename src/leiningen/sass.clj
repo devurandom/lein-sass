@@ -1,12 +1,12 @@
 (ns leiningen.sass
-  (:require [clojure.set :refer [rename-keys]]
-            [clojure.java.io :as io]
-            [clojure.pprint]
-            [clojure.string :as s])
+  (:require
+    [clojure.java.io :as io]
+    [clojure.pprint]
+    [clojure.set :refer [rename-keys]]
+    [clojure.string :as s])
   (:import
-    java.io.File
-    [java.nio.file FileSystems Paths StandardWatchEventKinds]
-    [javax.script Invocable ScriptEngineManager]))
+    (java.nio.file FileSystems Paths StandardWatchEventKinds)
+    (javax.script Invocable ScriptEngineManager)))
 
 (def compiled? (atom false))
 (defonce engine (let [e (.getEngineByName (ScriptEngineManager.) "nashorn")]
